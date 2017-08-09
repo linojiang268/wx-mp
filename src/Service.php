@@ -93,7 +93,20 @@ class Service
      * Create Menu
      *
      * @param $accessToken
-     * @param array $menu
+     * @param array $menu  array keys taken:
+     *                       "button" => [
+     *                          ['type' => 'click', 'name' => "测试1", 'key'  => 'test1',],
+     *                          ['type' => 'view', 'name' => "测试2", 'url'  => 'https://www.baidu.com',],
+     *                          ['type' => 'view', 'name' => "测试3", 'url'  => 'https://www.soso.com',],
+     *                          ["name": "button", "sub_button" => [
+     *                              "list": [
+     *                                  [
+     *                                      "type": "view",
+     *                                      "name": "测试sub",
+     *                                      "url": "http://www.qq.com"
+     *                                  ],
+     *                              ]
+     *                          ]
      * @throws \Exception
      */
     public function createMenu($accessToken, array $menu = [])
