@@ -8,15 +8,44 @@ use GuzzleHttp\RequestOptions;
 
 class Service
 {
+    /**
+     * Url to get access token
+     */
     const GET_ACCESS_TOKEN_URL      = 'https://api.weixin.qq.com/cgi-bin/token';
+
+    /**
+     * Url to delete menu in mp
+     */
     const DELETE_MENU_URL           = 'https://api.weixin.qq.com/cgi-bin/menu/delete';
+
+    /**
+     * Url to create menu in mp
+     */
     const CREATE_MENU_URL           = 'https://api.weixin.qq.com/cgi-bin/menu/create';
+
+    /**
+     * Url to send template message
+     */
     const SEND_TEMPLATE_MESSAGE_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send';
 
     /**
      * @var ClientInterface
      */
     private $client;
+
+    /**
+     * App id
+     *
+     * @var string
+     */
+    private $appId;
+
+    /**
+     * App secret
+     *
+     * @var string
+     */
+    private $appSecret;
 
     public function __construct($appId, $appSecret, ClientInterface $client = null)
     {
