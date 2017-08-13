@@ -152,8 +152,8 @@ class Service
     public function getSignatureInfo($ticket, $url)
     {
         $params = [
-            'noncestr'     => str_random(16),
             'jsapi_ticket' => $ticket,
+            'noncestr'     => str_random(16),
             'timestamp'    => time(),
             'url'          => ($index = strpos($url,'#')) ? substr($url, 0, $index) : $url,
         ];
