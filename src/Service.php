@@ -24,6 +24,11 @@ class Service
     const CREATE_MENU_URL           = 'https://api.weixin.qq.com/cgi-bin/menu/create';
 
     /**
+     * Url to get ticket in mp
+     */
+    const GET_TICKET_URL            = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket';
+
+    /**
      * Url to send template message
      */
     const SEND_TEMPLATE_MESSAGE_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send';
@@ -120,6 +125,54 @@ class Service
     }
 
     /**
+     * Get ticket
+     *
+     * @param $accessToken
+     * @return array [ticket, expires_in]
+     * @throws \Exception
+     */
+    public function getTicket($accessToken)
+    {
+        $responseObj = $this->sendGetRequestAndDecode($this->buildRequestUrlAndParamsForGetTicket($accessToken));
+
+        if (isset($responseObj['errcode']) && 0 != $responseObj['errcode']) {
+            throw new \Exception($responseObj['errmsg']);
+        }
+
+        return [$responseObj['ticket'], $responseObj['expires_in']];
+    }
+
+    /**
+     * Get signature
+     *
+     * @param $ticket
+     * @param $url
+     * @return array [app_id, timestamp, nonce_str, signature]
+     */
+    public function getSignatureInfo($ticket, $url)
+    {
+        $params = [
+            'noncestr'     => str_random(16),
+            'jsapi_ticket' => $ticket,
+            'timestamp'    => time(),
+            'url'          => ($index = strpos($url,'#')) ? substr($url, 0, $index) : $url,
+        ];
+
+        $pieces = [];
+        foreach ($params as $k => $v) {
+            array_push($pieces, sprintf("%s=%s", $k, $v));
+        }
+
+        return [
+            'app_id'    => $this->appId,
+            'timestamp' => $params['timestamp'],
+            'nonce_str' => $params['noncestr'],
+            'signature' => sha1(implode('&', $pieces)),
+
+        ];
+    }
+
+    /**
      * @param $accessToken
      * @param $touser         openid of touser
      * @param $templateId
@@ -178,6 +231,18 @@ class Service
         return [
             self::CREATE_MENU_URL . '?access_token=' . $accessToken, $menu,
         ];
+    }
+
+    /**
+     * @param $accessToken
+     * @return string
+     */
+    private function buildRequestUrlAndParamsForGetTicket($accessToken)
+    {
+        return self::GET_TICKET_URL . '?' . http_build_query([
+                'access_token' => $accessToken,
+                'type'         =>'jsapi',
+            ]);
     }
 
     /**

@@ -13,6 +13,14 @@ list($accessToken, $expiresIn) = $service->getAccessToken();
 
 // echo $accessToken . "\n" . $expiresIn;
 
+list($ticket, $expiresIn) = $service->getTicket($accessToken);
+
+// echo $ticket . "\n" . $expiresIn;
+
+$signatureInfo = $service->getSignatureInfo($ticket, "http://domain/request#abc");
+
+// var_dump($signatureInfo);
+
 $service->deleteMenu($accessToken);
 
 $service->createMenu($accessToken, [
