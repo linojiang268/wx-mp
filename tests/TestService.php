@@ -2,8 +2,8 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 $template = '{{description.DATA}}测试参数1：{{param1.DATA}}测试参数2：{{param2.DATA}}测试参数3：{{param3.DATA}}测试参数4：{{param4.DATA}}{{remark.DATA}}';
-$testAppId = '';
-$testAppSecret = '';
+$testAppId = 'wx8c079cf8634ec86e';
+$testAppSecret = 'e34cd5cdbad30e6b9871365feca331fa';
 $openid = '';
 $templateId = '';
 
@@ -11,15 +11,15 @@ $service = new \Ouarea\WxMp\Service($testAppId, $testAppSecret);
 
 list($accessToken, $expiresIn) = $service->getAccessToken();
 
-// echo $accessToken . "\n" . $expiresIn;
+echo $accessToken . "\n" . $expiresIn . "\n";
 
 list($ticket, $expiresIn) = $service->getTicket($accessToken);
 
-// echo $ticket . "\n" . $expiresIn;
+echo $ticket . "\n" . $expiresIn . "\n";
 
 $signatureInfo = $service->getSignatureInfo($ticket, "http://domain/request#abc");
 
-// var_dump($signatureInfo);
+var_dump($signatureInfo);
 
 $service->deleteMenu($accessToken);
 
@@ -51,3 +51,6 @@ $service->sendTemplateMessage($accessToken, $openid, $templateId, [
         'value' => '',
     ],
 ], null, ['url' => 'https://www.baidu.com']);
+
+$shortUrl = $service->long2ShortUrl($accessToken, 'https://domain.com/test_long_url');
+echo $shortUrl . "\n";

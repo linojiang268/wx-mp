@@ -34,6 +34,11 @@ class Service
     const SEND_TEMPLATE_MESSAGE_URL = 'https://api.weixin.qq.com/cgi-bin/message/template/send';
 
     /**
+     * Url to longToShort
+     */
+    const LONG_TO_SHORT_URL = 'https://api.weixin.qq.com/cgi-bin/shorturl';
+
+    /**
      * @var ClientInterface
      */
     private $client;
@@ -309,6 +314,28 @@ class Service
         }
 
         return $response;
+    }
+
+    /**
+     * Long url to short url
+     *
+     * @param $accessToken
+     * @param $longUrl
+     * @return mixed
+     * @throws \Exception
+     */
+    public function long2ShortUrl($accessToken, $longUrl)
+    {
+        $responseObj = $this->sendPostRequestAndDecode(self::LONG_TO_SHORT_URL . '?access_token=' . $accessToken, [
+            'action'   => 'long2short',
+            'long_url' => $longUrl,
+        ]);
+
+        if (isset($responseObj['errcode']) && 0 != $responseObj['errcode']) {
+            throw new \Exception($responseObj['errmsg']);
+        }
+
+        return $responseObj['short_url'];
     }
 
     /**
