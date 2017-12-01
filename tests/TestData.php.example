@@ -1,0 +1,8 @@
+<?php
+
+class TestData
+{
+    const APPID    = '';
+    const SECRET   = '';
+    const OPENID   = '';
+}

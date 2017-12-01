@@ -5,3 +5,5 @@
 
 # intellij generated meta files
 .idea
+
+/tests/TestData.php

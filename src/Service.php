@@ -39,6 +39,16 @@ class Service
     const LONG_TO_SHORT_URL = 'https://api.weixin.qq.com/cgi-bin/shorturl';
 
     /**
+     * Url to get user info
+     */
+    const GET_USER_INFO = 'https://api.weixin.qq.com/cgi-bin/user/info';
+
+    /**
+     * Url to list user infos
+     */
+    const LIST_USER_INFOS = 'https://api.weixin.qq.com/cgi-bin/user/info/batchget';
+
+    /**
      * @var ClientInterface
      */
     private $client;
@@ -204,6 +214,62 @@ class Service
         if (0 != $responseObj['errcode']) {
             throw new \Exception($responseObj['errmsg']);
         }
+    }
+
+    /**
+     * Get user info by openid of weixin
+     *
+     * @param $accessToken
+     * @param $openid
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    public function getUserInfo($accessToken, $openid)
+    {
+        $url = self::GET_USER_INFO . '?' . http_build_query([
+                'access_token' => $accessToken,
+                'openid' => $openid,
+                'lang'   =>'zh_CN',
+            ]);
+
+        $responseObj = $this->sendGetRequestAndDecode($url);
+
+        if (isset($responseObj['errcode']) && 0 != $responseObj['errcode']) {
+            throw new \Exception($responseObj['errmsg']);
+        }
+
+        return $responseObj;
+    }
+
+    /**
+     * List user infos by openids of weixin
+     *
+     * @param $accessToken
+     * @param array $openids
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    public function listUserInfos($accessToken, array $openids)
+    {
+        $url    = self::LIST_USER_INFOS . '?access_token=' . $accessToken;
+        $params = [
+            'user_list' => array_map(function ($openid) {
+                return [
+                    'openid' => $openid,
+                    'lang' => 'zh_CN',
+                ];
+            }, $openids),
+        ];
+
+        $responseObj = $this->sendPostRequestAndDecode($url, $params);
+
+        if (isset($responseObj['errcode']) && 0 != $responseObj['errcode']) {
+            throw new \Exception($responseObj['errmsg']);
+        }
+
+        return [
+            'user_infos' => $responseObj['user_info_list'],
+        ];
     }
 
     private function buildRequestUrlForGetAccessToken()
