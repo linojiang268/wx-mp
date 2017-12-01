@@ -49,6 +49,11 @@ class Service
     const LIST_USER_INFOS = 'https://api.weixin.qq.com/cgi-bin/user/info/batchget';
 
     /**
+     * Url to list fans
+     */
+    const LIST_FANS = 'https://api.weixin.qq.com/cgi-bin/user/get';
+
+    /**
      * @var ClientInterface
      */
     private $client;
@@ -183,7 +188,6 @@ class Service
             'timestamp' => $params['timestamp'],
             'nonce_str' => $params['noncestr'],
             'signature' => sha1(implode('&', $pieces)),
-
         ];
     }
 
@@ -246,7 +250,7 @@ class Service
      *
      * @param $accessToken
      * @param array $openids
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return array
      * @throws \Exception
      */
     public function listUserInfos($accessToken, array $openids)
@@ -267,8 +271,35 @@ class Service
             throw new \Exception($responseObj['errmsg']);
         }
 
+        return $responseObj['user_info_list'];
+    }
+
+    /**
+     * List user infos by openids of weixin
+     *
+     * @param $accessToken
+     * @param string|null $nextOpenid
+     * @return array   [total, count, openids, next_openid]
+     * @throws \Exception
+     */
+    public function listFans($accessToken, $nextOpenid = null)
+    {
+        $url = self::LIST_FANS . '?' . http_build_query(array_filter([
+                'access_token' => $accessToken,
+                'next_openid'  => $nextOpenid,
+            ]));
+
+        $responseObj = $this->sendGetRequestAndDecode($url);
+
+        if (isset($responseObj['errcode']) && 0 != $responseObj['errcode']) {
+            throw new \Exception($responseObj['errmsg']);
+        }
+
         return [
-            'user_infos' => $responseObj['user_info_list'],
+            'total'       => $responseObj['total'],
+            'count'       => $responseObj['count'],
+            'openids'     => $responseObj['count'] > 0 ? $responseObj['data']['openid'] : [],
+            'next_openid' => $responseObj['next_openid'] ?: null,
         ];
     }
 
